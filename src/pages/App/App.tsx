@@ -1,32 +1,16 @@
 import { createTheme, ThemeProvider } from '@mui/material';
 import Login from '../../components/Login/Login.tsx';
+import { LoginResponse } from "../../services/api/apiService.ts";
 
 const theme = createTheme();
 
-type LoginPayload = {
-    username: string;
-    password: string;
-};
-
-const App = () => {
+const App = (
+    { loginService }: { loginService: (username: string, password: string) => Promise<LoginResponse> }
+) => {
     const handleLogin = async (username: string, password: string) => {
-        const payload: LoginPayload = { username, password };
-
         try {
-            const response = await fetch(import.meta.env.VITE_MOOD_API_URL + '/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) {
-                throw new Error('Login failed');
-            }
-
-            const data = await response.json();
-            console.log(data);
+            const data = await loginService(username, password); // Call the injected service
+            console.log('Login successful:', data);
         } catch (error) {
             console.error(error);
         }

@@ -8,7 +8,12 @@ describe('App Component', () => {
     });
 
     it('renders the Login component', () => {
-        render(<App />);
+        const mockLoginService = vi.fn().mockResolvedValue({
+            token: 'test-token',
+            user: { username: 'testuser', email: 'testuser@example.com' },
+        });
+
+        render(<App loginService={mockLoginService} />);
 
         // Assert that the Login component is rendered
         expect(screen.getByLabelText('Username')).toBeInTheDocument();
@@ -16,69 +21,49 @@ describe('App Component', () => {
         expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument();
     });
 
-    it('calls handleLogin with correct parameters on login', async () => {
-        global.fetch = vi.fn(
-            async (): Promise<Response> =>
-                new Response(JSON.stringify({ token: 'test-token' }), {
-                    status: 200,
-                    headers: { 'Content-Type': 'application/json' },
-                }),
-        );
+    it('calls loginService with the correct parameters and handles success', async () => {
+        const mockLoginService = vi.fn().mockResolvedValue({
+            token: 'test-token',
+            user: { username: 'testuser', email: 'testuser@example.com' },
+        });
 
-        render(<App />);
+        render(<App loginService={mockLoginService} />);
 
         const usernameInput = screen.getByLabelText('Username');
         const passwordInput = screen.getByLabelText('Password');
         const loginButton = screen.getByRole('button', { name: 'Login' });
 
-        // Simulate user interaction
         fireEvent.change(usernameInput, { target: { value: 'testuser' } });
         fireEvent.change(passwordInput, { target: { value: 'password123' } });
         fireEvent.click(loginButton);
 
-
-
-        // Assert fetch was called with the correct data
-        expect(fetch).toHaveBeenCalledWith(expect.stringContaining('/auth/login'), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: 'testuser',
-                password: 'password123',
-            }),
+        await waitFor(() => {
+            expect(mockLoginService).toHaveBeenCalledTimes(1);
+            expect(mockLoginService).toHaveBeenCalledWith('testuser', 'password123');
         });
     });
 
     it('handles login failure gracefully', async () => {
-        global.fetch = vi.fn(
-            async (): Promise<Response> =>
-                new Response(JSON.stringify({ message: 'Login failed' }), {
-                    status: 404,
-                    headers: { 'Content-Type': 'application/json' },
-                }),
-        );
-        const consoleErrorSpy = vi.spyOn(console, 'error');
+        const mockLoginService =
+            vi.fn().mockRejectedValue(new Error('Login failed'));
 
-        render(<App />);
+        const consoleErrorSpy =
+            vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        render(<App loginService={mockLoginService} />);
 
         const usernameInput = screen.getByLabelText('Username');
         const passwordInput = screen.getByLabelText('Password');
         const loginButton = screen.getByRole('button', { name: 'Login' });
 
-        // Simulate user interaction
         fireEvent.change(usernameInput, { target: { value: 'wronguser' } });
         fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } });
         fireEvent.click(loginButton);
 
-        // Assert fetch was called
-        expect(global.fetch).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(consoleErrorSpy).toHaveBeenCalledWith(new Error('Login failed'));
+        });
 
-        // Assert that an error was logged (optional)
-        await waitFor( () => expect(consoleErrorSpy).toHaveBeenCalledWith(
-            new Error('Login failed'))
-        );
         consoleErrorSpy.mockRestore();
     });
 });

@@ -1,5 +1,5 @@
 import { login } from './apiService';
-import { vi } from 'vitest';
+import { vi, Mock } from 'vitest';
 
 
 // Mock the fetch API globally
@@ -19,7 +19,7 @@ describe('apiService - login', () => {
         };
 
         // Mock fetch to simulate a successful response
-        (global.fetch as vi.Mock).mockResolvedValueOnce({
+        (global.fetch as Mock).mockResolvedValueOnce({
             ok: true,
             json: vi.fn().mockResolvedValueOnce(mockResponse),
         });
@@ -42,7 +42,7 @@ describe('apiService - login', () => {
 
     it('should throw an error when the response is not ok', async () => {
         // Mock fetch to simulate a failed response
-        (global.fetch as vi.Mock).mockResolvedValueOnce({
+        (global.fetch as Mock).mockResolvedValueOnce({
             ok: false,
             json: vi.fn(),
         });
@@ -63,7 +63,7 @@ describe('apiService - login', () => {
 
     it('should throw an error if the fetch call itself fails', async () => {
         // Mock fetch to simulate a network error or similar failure
-        (global.fetch as vi.Mock).mockRejectedValueOnce(new Error('Network error'));
+        (global.fetch as Mock).mockRejectedValueOnce(new Error('Network error'));
 
         const payload = { username: 'testuser', password: 'password123' };
 

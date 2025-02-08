@@ -10,14 +10,20 @@ const Login = ({ onLogin }: LoginProps) => {
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState('');
 
-    const handleSubmit = (event: FormEvent) => {
+    const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
         if (!username || !password) {
             setError('Please fill out all fields');
             return;
         }
         setError('');
-        onLogin(username, password);
+        try {
+            await onLogin(username, password);
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(error.message);
+            }
+        }
     };
 
     return (

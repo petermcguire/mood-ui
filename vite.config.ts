@@ -10,6 +10,9 @@ export default defineConfig({
     TanStackRouterVite({ autoCodeSplitting: true }),
     react(),
   ],
+  build: {
+    sourcemap: true,
+  },
   test: {
     globals: true, // Enable global `describe`, `test`, etc.
     environment: 'jsdom', // Simulate browser-like environment

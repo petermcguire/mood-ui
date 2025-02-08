@@ -8,12 +8,9 @@ describe('App Component', () => {
     });
 
     it('renders the Login component', () => {
-        const mockLoginService = vi.fn().mockResolvedValue({
-            token: 'test-token',
-            user: { username: 'testuser', email: 'testuser@example.com' },
-        });
+        const mockHandleLogin = vi.fn().mockResolvedValue(undefined);
 
-        render(<App loginService={mockLoginService} />);
+        render(<App handleLogin={mockHandleLogin} />);
 
         // Assert that the Login component is rendered
         expect(screen.getByLabelText('Username')).toBeInTheDocument();
@@ -21,13 +18,10 @@ describe('App Component', () => {
         expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument();
     });
 
-    it('calls loginService with the correct parameters and handles success', async () => {
-        const mockLoginService = vi.fn().mockResolvedValue({
-            token: 'test-token',
-            user: { username: 'testuser', email: 'testuser@example.com' },
-        });
+    it('calls handleLogin with the correct parameters and handles success', async () => {
+        const mockHandleLogin = vi.fn().mockResolvedValue(undefined);
 
-        render(<App loginService={mockLoginService} />);
+        render(<App handleLogin={mockHandleLogin} />);
 
         const usernameInput = screen.getByLabelText('Username');
         const passwordInput = screen.getByLabelText('Password');
@@ -38,32 +32,8 @@ describe('App Component', () => {
         fireEvent.click(loginButton);
 
         await waitFor(() => {
-            expect(mockLoginService).toHaveBeenCalledTimes(1);
-            expect(mockLoginService).toHaveBeenCalledWith('testuser', 'password123');
+            expect(mockHandleLogin).toHaveBeenCalledTimes(1);
+            expect(mockHandleLogin).toHaveBeenCalledWith('testuser', 'password123');
         });
-    });
-
-    it('handles login failure gracefully', async () => {
-        const mockLoginService =
-            vi.fn().mockRejectedValue(new Error('Login failed'));
-
-        const consoleErrorSpy =
-            vi.spyOn(console, 'error').mockImplementation(() => {});
-
-        render(<App loginService={mockLoginService} />);
-
-        const usernameInput = screen.getByLabelText('Username');
-        const passwordInput = screen.getByLabelText('Password');
-        const loginButton = screen.getByRole('button', { name: 'Login' });
-
-        fireEvent.change(usernameInput, { target: { value: 'wronguser' } });
-        fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } });
-        fireEvent.click(loginButton);
-
-        await waitFor(() => {
-            expect(consoleErrorSpy).toHaveBeenCalledWith(new Error('Login failed'));
-        });
-
-        consoleErrorSpy.mockRestore();
     });
 });

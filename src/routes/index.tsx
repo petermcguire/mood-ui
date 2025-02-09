@@ -14,7 +14,6 @@ function RouteComponent() {
   const { signIn } = useAuth()
   const handleLogin = async (username: string, password: string) => {
     const data = await login({ username, password }, apiUrl);
-    console.log('Login successful:', data);
     signIn(data);
     await navigate({to: '/dashboard'});
   };

@@ -1,50 +1,89 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import {render, screen, fireEvent, waitFor} from '@testing-library/react';
 import { vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import Login from './Login';
 
 // Mock the `onLogin` function
-const mockOnLogin = vi.fn().mockResolvedValue(undefined);
+// const submitButton = screen.getByRole('button', { name: 'Login' });
 
 describe('Login component', () => {
+    let submitButton: HTMLElement;
+
     beforeEach(() => {
         // Reset mock functions before each test
         vi.clearAllMocks();
-        render(<Login onLogin={mockOnLogin} />);
     });
 
-    it('renders the login form', () => {
-        // Assert that input fields and button render
-        expect(screen.getByLabelText('Username')).toBeInTheDocument();
-        expect(screen.getByLabelText('Password')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument();
+    describe('Successes', () => {
+        const mockOnLogin = vi.fn().mockResolvedValue(undefined);
+
+        beforeEach(() => {
+            render(<Login onLogin={mockOnLogin} />);
+            submitButton = screen.getByRole('button', { name: 'Login' });
+        });
+
+        it('renders the login form', async () => {
+            await waitFor(() => {
+                // Assert that input fields and button render
+                expect(screen.getByLabelText('Username')).toBeInTheDocument();
+                expect(screen.getByLabelText('Password')).toBeInTheDocument();
+                expect(submitButton).toBeInTheDocument();
+            });
+        });
+
+        it('calls onLogin with correct values when the form is submitted', async () => {
+            // Simulate typing and form submission
+            const usernameField = screen.getByLabelText('Username');
+            const passwordField = screen.getByLabelText('Password');
+
+            await userEvent.type(usernameField, 'testuser');
+            await userEvent.type(passwordField, 'password123');
+            fireEvent.click(submitButton);
+
+            await waitFor(() => {
+                // Verify that `onLogin` was called with the correct parameters
+                expect(mockOnLogin).toHaveBeenCalledTimes(1);
+                expect(mockOnLogin).toHaveBeenCalledWith('testuser', 'password123');
+            });
+        });
     });
 
-    it('calls onLogin with correct values when the form is submitted', async () => {
-        // Simulate typing and form submission
-        const usernameField = screen.getByLabelText('Username');
-        const passwordField = screen.getByLabelText('Password');
-        const submitButton = screen.getByRole('button', { name: 'Login' });
+    describe('Failures', () => {
+        const mockOnLogin = vi.fn().mockRejectedValue(new Error('Login failed'));
 
-        await userEvent.type(usernameField, 'testuser');
-        await userEvent.type(passwordField, 'password123');
-        fireEvent.click(submitButton);
+        beforeEach(() => {
+            render(<Login onLogin={mockOnLogin} />);
+            submitButton = screen.getByRole('button', { name: 'Login' });
+        });
 
-        // Verify that `onLogin` was called with the correct parameters
-        expect(mockOnLogin).toHaveBeenCalledTimes(1);
-        expect(mockOnLogin).toHaveBeenCalledWith('testuser', 'password123');
-    });
+        it('shows an error message when required fields are empty', async () => {
+            // Simulate form submission without filling fields
+            fireEvent.click(submitButton);
 
-    it('shows an error message when required fields are empty', () => {
-        // Simulate form submission without filling fields
-        const submitButton = screen.getByRole('button', { name: 'Login' });
-        fireEvent.click(submitButton);
+            await waitFor(() => {
+                // Look for error message
+                const error = screen.getByText('Please fill out all fields');
+                expect(error).toBeInTheDocument();
 
-        // Look for error message
-        const error = screen.getByText('Please fill out all fields');
-        expect(error).toBeInTheDocument();
+                // Ensure `onLogin` is not called
+                expect(mockOnLogin).not.toHaveBeenCalled();
+            });
+        });
 
-        // Ensure `onLogin` is not called
-        expect(mockOnLogin).not.toHaveBeenCalled();
+        it('shows an error message when onLogin fails', async () => {
+            const usernameField = screen.getByLabelText('Username');
+            const passwordField = screen.getByLabelText('Password');
+
+            await userEvent.type(usernameField, 'testuser');
+            await userEvent.type(passwordField, 'password123');
+            // Simulate form submission without filling fields
+            fireEvent.click(submitButton);
+
+            // Look for error message
+            await waitFor(() => {
+                const error = screen.getByText('Login failed');
+                expect(error).toBeInTheDocument();
+            });
+        });
     });
 });

@@ -23,6 +23,8 @@ export default defineConfig({
       reportOnFailure: true,
       exclude: [
         'src/main.tsx',
+        'src/routeTree.gen.ts',
+        'src/test/utils/*',
         ...coverageConfigDefaults.exclude
       ],
     },

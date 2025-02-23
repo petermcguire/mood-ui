@@ -1,4 +1,4 @@
-import {addMood, AddMoodPayload, login, LoginPayload, LoginResponse} from './apiService';
+import { login, LoginPayload, LoginResponse} from './apiService';
 import { vi, Mock } from 'vitest';
 
 

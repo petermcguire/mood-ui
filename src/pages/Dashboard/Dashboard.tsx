@@ -1,7 +1,6 @@
 import { createTheme, ThemeProvider } from '@mui/material';
 import LogMood from "../../components/LogMood/LogMood.tsx";
 import MoodChart from "../../components/MoodChart/MoodChart.tsx";
-import {getRouteApi} from "@tanstack/react-router";
 
 const theme = createTheme();
 

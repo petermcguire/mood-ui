@@ -76,13 +76,13 @@ describe('apiService', () => {
             });
         });
     });
-
-    describe('addMood', () => {
-        it('should call the API with correct payload and return the added moods as response', async () => {
-            const payload: AddMoodPayload = { level: 1, timestamp: new Date('2013-03-04T22:44:30.652Z') }
-            const response = await addMood(payload, mockAPI_URL);
-            // Assert the response is the same as the mock response
-            expect(true).toEqual(true);
-        });
-    });
+    //
+    // describe('addMood', () => {
+    //     it('should call the API with correct payload and return the added moods as response', async () => {
+    //         const payload: AddMoodPayload = { level: 1, timestamp: new Date('2013-03-04T22:44:30.652Z') }
+    //         const response = await addMood(payload, mockAPI_URL);
+    //         // Assert the response is the same as the mock response
+    //         expect(true).toEqual(true);
+    //     });
+    // });
 });

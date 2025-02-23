@@ -8,9 +8,9 @@ const theme = createTheme();
 
 
 const Dashboard = () => {
-    const routeApi = getRouteApi('/_authenticated/dashboard');
-    const data = routeApi.useLoaderData();
-    console.log(data);
+    // const routeApi = getRouteApi('/_authenticated/dashboard');
+    // const data = routeApi.useLoaderData();
+    // console.log(data);
     return (
         <ThemeProvider theme={theme}>
             <LogMood />

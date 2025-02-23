@@ -13,7 +13,13 @@ export const useAuth = () => {
 
   const isLogged = () => localStorage.getItem(key) != null;
 
-  return { signIn, signOut, isLogged };
+  const getKey = () => {
+    const localKey = localStorage.getItem(key);
+    if (localKey != null) return JSON.parse(localKey);
+    else return null;
+  };
+
+  return { signIn, signOut, isLogged, getKey };
 };
 
 export type AuthContext = ReturnType<typeof useAuth>;

@@ -17,6 +17,8 @@ export default defineConfig({
     globals: true, // Enable global `describe`, `test`, etc.
     environment: 'jsdom', // Simulate browser-like environment
     setupFiles: './src/test/setup.ts', // Setup file for test (optional)
+    "clearMocks": true,
+    "restoreMocks": true,
     coverage: {
       enabled: true,
       provider: 'v8',

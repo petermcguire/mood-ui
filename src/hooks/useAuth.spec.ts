@@ -1,18 +1,17 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { useAuth } from "./useAuth";
 import { LoginResponse } from "../services/api/apiService.ts";
 
 describe("useAuth", () => {
   const mockKey = "loginResponse";
   const testResponse: LoginResponse = {
-    token: "testToken",
-    user: { username: "user", email: "user@email.com" }
+    accessToken: "testToken",
+    userId: 1
   }; // A mock LoginResponse object
 
   beforeEach(() => {
     // Clear all mocks and anything stored in localStorage before each test
     localStorage.clear();
-    vi.clearAllMocks();
   });
 
   it("should call signIn and store loginResponse in localStorage", () => {

@@ -3,9 +3,6 @@ import { vi } from 'vitest';
 import App from './App'; // Adjust the path according to your file structure
 
 describe('App Component', () => {
-    beforeEach(() => {
-        vi.clearAllMocks(); // Clear previous mocks between tests
-    });
 
     it('renders the Login component', () => {
         const mockHandleLogin = vi.fn().mockResolvedValue(undefined);

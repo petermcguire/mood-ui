@@ -1,5 +1,5 @@
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
-import { vi } from 'vitest';
+import {Mock, vi} from 'vitest';
 import userEvent from '@testing-library/user-event';
 import Login from './Login';
 
@@ -9,15 +9,11 @@ import Login from './Login';
 describe('Login component', () => {
     let submitButton: HTMLElement;
 
-    beforeEach(() => {
-        // Reset mock functions before each test
-        vi.clearAllMocks();
-    });
-
     describe('Successes', () => {
-        const mockOnLogin = vi.fn().mockResolvedValue(undefined);
+        let mockOnLogin: Mock;
 
         beforeEach(() => {
+            mockOnLogin = vi.fn().mockResolvedValue(undefined);
             render(<Login onLogin={mockOnLogin} />);
             submitButton = screen.getByRole('button', { name: 'Login' });
         });
@@ -49,9 +45,10 @@ describe('Login component', () => {
     });
 
     describe('Failures', () => {
-        const mockOnLogin = vi.fn().mockRejectedValue(new Error('Login failed'));
+        let mockOnLogin: Mock;
 
         beforeEach(() => {
+            mockOnLogin = vi.fn().mockRejectedValue(new Error('Login failed'));
             render(<Login onLogin={mockOnLogin} />);
             submitButton = screen.getByRole('button', { name: 'Login' });
         });

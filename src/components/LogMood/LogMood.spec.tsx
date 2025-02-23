@@ -1,12 +1,9 @@
 import { render, screen } from '@testing-library/react';
-import { vi } from 'vitest';
 import LogMood from "./LogMood.tsx";
 
 
 describe('LogMood component', () => {
     beforeEach(() => {
-        // Reset mock functions before each test
-        vi.clearAllMocks();
         render(<LogMood />);
     });
 

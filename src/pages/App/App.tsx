@@ -1,5 +1,6 @@
 import { createTheme, ThemeProvider } from '@mui/material';
 import Login from '../../components/Login/Login.tsx';
+import 'reflect-metadata';
 
 const theme = createTheme();
 

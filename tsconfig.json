@@ -8,6 +8,7 @@
     /* vitest */
     "types": ["vitest/globals"],
     "typeRoots": ["node_modules"],
-    "sourceMap": true
+    "sourceMap": true,
+
   }
 }

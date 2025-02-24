@@ -11,7 +11,7 @@ vi.mock('../../components/LogMood/LogMood.tsx', () => ({
 describe('Dashboard component', () => {
   it("renders Dashboard component with ThemeProvider and LogMood child", () => {
     // Render the Dashboard component
-    render(<Dashboard />);
+    render(<Dashboard data={[ { level: 1, timestamp: new Date() } ]} />);
 
     // Ensure the ThemeProvider is applied via the LogMood child component (basic check for rendering)
     const logMoodElement = screen.getByTestId("log-mood-mock");

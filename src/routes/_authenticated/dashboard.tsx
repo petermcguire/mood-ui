@@ -10,10 +10,14 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
   loader: async ( { context } ) => {
     const { getKey } = context.authentication;
     const key = getKey();
-    return await allMoodsForUser(apiUrl, key.userId, key.accessToken);
+    let moods = await allMoodsForUser(apiUrl, key.userId, key.accessToken);
+    // sort it
+    moods = moods.sort((a, b) => a.timestamp.valueOf() - b.timestamp.valueOf());
+    return moods;
   }
 })
 
 function RouteComponent() {
-  return <Dashboard />
+  const data = Route.useLoaderData();
+  return <Dashboard data = { data } />
 }

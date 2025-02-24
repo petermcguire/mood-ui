@@ -1,13 +1,25 @@
 import { LineChart } from "@mui/x-charts";
+import {Mood} from "../../services/api/apiService.ts";
 
-const MoodChart = () => {
+type MoodChartProps = {
+    data: Mood[];
+};
 
+
+const MoodChart = ({ data }: MoodChartProps) => {
     return (
         <LineChart
-            xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
+            dataset={data}
+            xAxis={[
+                {
+                    scaleType: 'utc',
+                    dataKey: 'timestamp',
+                    // data: [1,2,3,4],
+                }
+            ]}
             series={[
                 {
-                    data: [2, 5.5, 2, 8.5, 1.5, 5],
+                   dataKey: 'level',
                 },
             ]}
             width={500}

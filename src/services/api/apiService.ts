@@ -1,19 +1,25 @@
 // src/services/apiService.ts
 
-export type LoginPayload = {
+import {deserializeArray, Type} from "class-transformer";
+
+export interface LoginPayload {
     username: string;
     password: string;
 };
 
-export type LoginResponse = {
+export interface LoginResponse {
     accessToken: string;
     userId: number;
 };
 
-export type Mood = {
+
+export class Mood {
+
     level: number;
+
+    @Type(() => Date)
     timestamp: Date;
-};
+}
 
 export type AddMoodPayload = Mood;
 
@@ -57,7 +63,7 @@ export const login =
  * @throws Error if the request fails.
  */
 export const allMoodsForUser =
-    async (apiUrl: string, userId: number, token: string): Promise<AllMoodsForUser> => {
+    async (apiUrl: string, userId: number, token: string): Promise<Mood[]> => {
         const response = await fetch(`${apiUrl}/user/${userId}/moods`, {
             method: 'GET',
             headers: {
@@ -70,7 +76,13 @@ export const allMoodsForUser =
             throw new Error(`Failed to get moods for user ${userId}`);
         }
 
-        return response.json();
+        const json = await response.text();
+
+
+
+        const deser = deserializeArray<Mood>(Mood, json);
+
+        return deser;
     };
 
 /**

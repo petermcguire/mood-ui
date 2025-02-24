@@ -1,19 +1,20 @@
 import { createTheme, ThemeProvider } from '@mui/material';
 import LogMood from "../../components/LogMood/LogMood.tsx";
 import MoodChart from "../../components/MoodChart/MoodChart.tsx";
+import {Mood} from "../../services/api/apiService.ts";
 
 const theme = createTheme();
 
+type DashboardProps = {
+    data: Mood[];
+};
 
 
-const Dashboard = () => {
-    // const routeApi = getRouteApi('/_authenticated/dashboard');
-    // const data = routeApi.useLoaderData();
-    // console.log(data);
+const Dashboard = ({ data }: DashboardProps) => {
     return (
         <ThemeProvider theme={theme}>
             <LogMood />
-            <MoodChart />
+            <MoodChart data={data} />
         </ThemeProvider>
     );
 };

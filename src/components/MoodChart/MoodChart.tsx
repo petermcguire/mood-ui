@@ -9,7 +9,7 @@ type MoodChartProps = {
 const MoodChart = ({ data }: MoodChartProps) => {
     return (
         <LineChart
-            dataset={data}
+            dataset={data.map(({ timestamp, level }) => ({ timestamp, level }))}
             xAxis={[
                 {
                     scaleType: 'utc',

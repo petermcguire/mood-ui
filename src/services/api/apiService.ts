@@ -1,17 +1,19 @@
 // src/services/apiService.ts
+import 'reflect-metadata';
 
 import {deserializeArray, Type} from "class-transformer";
+
+const serviceApiUrl = import.meta.env.VITE_MOOD_API_URL;
 
 export interface LoginPayload {
     username: string;
     password: string;
-};
+}
 
 export interface LoginResponse {
     accessToken: string;
     userId: number;
-};
-
+}
 
 export class Mood {
 
@@ -22,10 +24,7 @@ export class Mood {
 }
 
 export type AddMoodPayload = Mood;
-
 export type AddMoodResponse = Mood[];
-
-export type AllMoodsForUser = Mood[];
 
 /**
  * Sends a POST request to log a user in.
@@ -35,7 +34,7 @@ export type AllMoodsForUser = Mood[];
  * @throws Error if the request fails.
  */
 export const login =
-    async (payload: LoginPayload, apiUrl: string): Promise<LoginResponse> => {
+    async (payload: LoginPayload, apiUrl: string = serviceApiUrl): Promise<LoginResponse> => {
     const response = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',
         headers: {
@@ -48,10 +47,7 @@ export const login =
         throw new Error('Login failed');
     }
 
-    const resp = await response.json();
-    console.log(resp);
-
-    return resp;
+    return await response.json();
 };
 
 /**
@@ -63,7 +59,7 @@ export const login =
  * @throws Error if the request fails.
  */
 export const allMoodsForUser =
-    async (apiUrl: string, userId: number, token: string): Promise<Mood[]> => {
+    async (userId: number, token: string, apiUrl: string = serviceApiUrl): Promise<Mood[]> => {
         const response = await fetch(`${apiUrl}/user/${userId}/moods`, {
             method: 'GET',
             headers: {
@@ -78,11 +74,7 @@ export const allMoodsForUser =
 
         const json = await response.text();
 
-
-
-        const deser = deserializeArray<Mood>(Mood, json);
-
-        return deser;
+        return deserializeArray<Mood>(Mood, json);
     };
 
 /**
@@ -94,7 +86,7 @@ export const allMoodsForUser =
  * @throws Error if the request fails.
  */
 export const addMood =
-    async (payload: AddMoodPayload, apiUrl: string, userId: number): Promise<AddMoodResponse> => {
+    async (payload: AddMoodPayload, userId: number, apiUrl: string = serviceApiUrl): Promise<AddMoodResponse> => {
         const response = await fetch(`${apiUrl}/user/${userId}/moods`, {
             method: 'PATCH',
             headers: {

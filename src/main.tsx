@@ -10,7 +10,10 @@ import {useAuth} from "./hooks/useAuth.ts";
 // Create a new router instance
 const router = createRouter({
     routeTree,
-    context:{ authentication: undefined! }
+    context: {
+        authentication: undefined!,
+        apiUrl: import.meta.env.VITE_MOOD_API_URL,
+    }
 })
 
 // Register the router instance for type safety

@@ -7,16 +7,14 @@ export const Route = createFileRoute('/')({
   component: RouteComponent,
 })
 
-const apiUrl = import.meta.env.VITE_MOOD_API_URL;
-
-function RouteComponent() {
+export function RouteComponent() {
   const navigate = useNavigate();
   const { signIn } = useAuth()
   const handleLogin = async (username: string, password: string) => {
     const loginPayload: LoginPayload = { username, password };
-    const data = await login(loginPayload, apiUrl);
+    const data = await login(loginPayload);
     signIn(data);
-    await navigate({to: '/dashboard'});
+    await navigate({to: '/dashboard', params: {userId: data.userId}});
   };
   return <App handleLogin={handleLogin} />
 }

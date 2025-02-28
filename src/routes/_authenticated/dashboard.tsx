@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import Dashboard from '../../pages/Dashboard/Dashboard.tsx'
-import {allMoodsForUser} from "../../services/api/apiService.ts";
+import {addMood, allMoodsForUser, Mood} from "../../services/api/apiService.ts";
 
-const apiUrl = import.meta.env.VITE_MOOD_API_URL;
 
 export const Route = createFileRoute('/_authenticated/dashboard')({
   component: RouteComponent,
@@ -10,7 +9,7 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
   loader: async ( { context } ) => {
     const { getKey } = context.authentication;
     const key = getKey();
-    let moods = await allMoodsForUser(apiUrl, key.userId, key.accessToken);
+    let moods = await allMoodsForUser(key.userId, key.accessToken);
     // sort it
     moods = moods.sort((a, b) => a.timestamp.valueOf() - b.timestamp.valueOf());
     return moods;
@@ -18,6 +17,10 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
 })
 
 function RouteComponent() {
-  const data = Route.useLoaderData();
-  return <Dashboard data = { data } />
+  const moods = Route.useLoaderData();
+  const {userId} = Route.useParams();
+  const handleMoodSubmit = async (mood: Mood) => {
+    return await addMood(mood, Route.useParams());
+  }
+  return <Dashboard userId={userId} data={moods} handleMoodSubmit={handleMoodSubmit} />
 }

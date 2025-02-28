@@ -4,6 +4,7 @@ import {AuthContext} from "../hooks/useAuth.ts";
 
 type RouterContext = {
     authentication: AuthContext;
+    apiUrl: string;
 };
 
 export const Route = createRootRouteWithContext<RouterContext>()({

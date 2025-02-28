@@ -1,12 +1,26 @@
-import { login, LoginPayload, LoginResponse} from './apiService';
-import { vi, Mock } from 'vitest';
+import {allMoodsForUser, login, LoginPayload, LoginResponse, Mood} from './apiService';
+import {Mock, vi} from 'vitest';
 
 
 // Mock the fetch API globally
 global.fetch = vi.fn();
 
 describe('apiService', () => {
-    const mockAPI_URL = 'https://mock-api.com';
+    const mockAPIUrl = 'https://mock-api.com';
+
+    describe('Mood', () => {
+        it('should correctly initialize fields during object creation', () => {
+            const level = 5;
+            const timestamp = new Date();
+
+            const mood = new Mood();
+            mood.level = level;
+            mood.timestamp = timestamp;
+
+            expect(mood.level).toBe(level);
+            expect(mood.timestamp).toBe(timestamp);
+        });
+    });
 
     describe('login', () => {
         it('should call the API with correct payload and return the login response', async () => {
@@ -21,15 +35,15 @@ describe('apiService', () => {
                 json: vi.fn().mockResolvedValueOnce(mockResponse),
             });
 
-            const payload = { username: 'testuser', password: 'password123' };
+            const payload = {username: 'testuser', password: 'password123'};
 
-            const response = await login(payload, mockAPI_URL);
+            const response = await login(payload, mockAPIUrl);
 
             // Assert fetch is called exactly once with the correct arguments
             expect(global.fetch).toHaveBeenCalledTimes(1);
-            expect(global.fetch).toHaveBeenCalledWith(`${mockAPI_URL}/auth/login`, {
+            expect(global.fetch).toHaveBeenCalledWith(`${mockAPIUrl}/auth/login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload),
             });
 
@@ -44,45 +58,64 @@ describe('apiService', () => {
                 json: vi.fn(),
             });
 
-            const payload: LoginPayload = { username: 'invaliduser', password: 'wrongpassword' };
+            const payload: LoginPayload = {username: 'invaliduser', password: 'wrongpassword'};
 
             // Expect the login function to throw a "Login failed" error
-            await expect(login(payload, mockAPI_URL)).rejects.toThrow('Login failed');
-
-            // Assert that fetch was called with the correct arguments
-            expect(global.fetch).toHaveBeenCalledTimes(1);
-            expect(global.fetch).toHaveBeenCalledWith(`${mockAPI_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
+            await expect(login(payload, mockAPIUrl)).rejects.toThrow('Login failed');
         });
 
         it('should throw an error if the fetch call itself fails', async () => {
             // Mock fetch to simulate a network error or similar failure
             (global.fetch as Mock).mockRejectedValueOnce(new Error('Network error'));
 
-            const payload: LoginPayload = { username: 'testuser', password: 'password123' };
+            const payload: LoginPayload = {username: 'testuser', password: 'password123'};
 
             // Expect the login function to throw the same network error
-            await expect(login(payload, mockAPI_URL)).rejects.toThrow('Network error');
-
-            // Assert that fetch was called with the correct arguments
-            expect(global.fetch).toHaveBeenCalledTimes(1);
-            expect(global.fetch).toHaveBeenCalledWith(`${mockAPI_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
+            await expect(login(payload, mockAPIUrl)).rejects.toThrow('Network error');
         });
     });
-    //
-    // describe('addMood', () => {
-    //     it('should call the API with correct payload and return the added moods as response', async () => {
-    //         const payload: AddMoodPayload = { level: 1, timestamp: new Date('2013-03-04T22:44:30.652Z') }
-    //         const response = await addMood(payload, mockAPI_URL);
-    //         // Assert the response is the same as the mock response
-    //         expect(true).toEqual(true);
-    //     });
-    // });
+
+    describe('allMoodsForUser', () => {
+        const mockResponse: Mood[] = [
+            {level: 1, timestamp: new Date()},
+            {level: 2, timestamp: new Date()},
+        ];
+        const testUserId = 1;
+        const testToken = "testToken";
+
+        it('should call the API with correct path and headers and return list of moods', async () => {
+            // Mock fetch to simulate a successful response
+            (global.fetch as Mock).mockResolvedValueOnce({
+                ok: true,
+                text: vi.fn().mockResolvedValueOnce(JSON.stringify(mockResponse)),
+            });
+
+            const response = await allMoodsForUser(mockAPIUrl, testUserId, testToken);
+
+            // Assert fetch is called exactly once with the correct arguments
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+            expect(global.fetch).toHaveBeenCalledWith(`${mockAPIUrl}/user/${testUserId}/moods`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${testToken}`,
+                },
+            });
+
+            // Assert the response is the same as the mock response
+            expect(response).toEqual(mockResponse);
+        });
+
+        it('should throw an error when the response is not ok', async () => {
+            // Mock fetch to simulate a failed response
+            (global.fetch as Mock).mockResolvedValueOnce({
+                ok: false,
+                text: vi.fn(),
+            });
+            // Expect thrown error
+            await expect(
+                allMoodsForUser(mockAPIUrl, testUserId, testToken)
+            ).rejects.toThrow(`Failed to get moods for user ${testUserId}`);
+        });
+    });
 });

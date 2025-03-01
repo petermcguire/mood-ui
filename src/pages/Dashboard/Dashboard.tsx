@@ -6,9 +6,8 @@ import {AddMoodResponse, Mood} from "../../services/api/apiService.ts";
 const theme = createTheme();
 
 type DashboardProps = {
-    userId: number,
     data: Mood[],
-    handleMoodSubmit: (mood: Mood, userId: number) => Promise<AddMoodResponse>;
+    handleMoodSubmit: (mood: Mood) => Promise<AddMoodResponse>;
 };
 
 

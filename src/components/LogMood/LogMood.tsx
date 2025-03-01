@@ -3,7 +3,7 @@ import {FormEvent, useState} from "react";
 import {AddMoodResponse, Mood} from "../../services/api/apiService.ts";
 
 type LogMoodProps = {
-    onMoodSubmit: (mood: Mood, userId: number) => Promise<AddMoodResponse>;
+    onMoodSubmit: (mood: Mood) => Promise<AddMoodResponse>;
 };
 
 const LogMood = ({ onMoodSubmit }: LogMoodProps) => {
@@ -16,7 +16,8 @@ const LogMood = ({ onMoodSubmit }: LogMoodProps) => {
             const mood = new Mood();
             mood.level = moodLevel;
             mood.timestamp = new Date();
-            await onMoodSubmit(mood);
+            const resp = await onMoodSubmit(mood);
+            console.log(resp);
         } catch (error) {
             console.log(error);
         }

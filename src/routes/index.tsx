@@ -14,7 +14,7 @@ export function RouteComponent() {
     const loginPayload: LoginPayload = { username, password };
     const data = await login(loginPayload);
     signIn(data);
-    await navigate({to: '/dashboard', params: {userId: data.userId}});
+    await navigate({to: `/dashboard/${data.userId}`});
   };
   return <App handleLogin={handleLogin} />
 }

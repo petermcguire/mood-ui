@@ -1,9 +1,10 @@
 // src/services/apiService.ts
 import 'reflect-metadata';
-
 import {deserializeArray, Type} from "class-transformer";
+import {key} from "../../hooks/useAuth.ts";
 
 const serviceApiUrl = import.meta.env.VITE_MOOD_API_URL;
+
 
 export interface LoginPayload {
     username: string;
@@ -25,6 +26,12 @@ export class Mood {
 
 export type AddMoodPayload = Mood;
 export type AddMoodResponse = Mood[];
+
+const getKey = () => {
+    const localKey = localStorage.getItem(key);
+    if (localKey != null) return JSON.parse(localKey);
+    else throw new Error(`User not logged in.`);
+};
 
 /**
  * Sends a POST request to log a user in.
@@ -53,23 +60,23 @@ export const login =
 /**
  * Sends a GET request to get a user's moods.
  * @param apiUrl The API URL
- * @param userId The user's ID
- * @param token
  * @returns The moods response if successful.
  * @throws Error if the request fails.
  */
 export const allMoodsForUser =
-    async (userId: number, token: string, apiUrl: string = serviceApiUrl): Promise<Mood[]> => {
-        const response = await fetch(`${apiUrl}/user/${userId}/moods`, {
+    async (apiUrl: string = serviceApiUrl): Promise<Mood[]> => {
+        const key = getKey();
+
+        const response = await fetch(`${apiUrl}/user/${key.userId}/moods`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${key.accessToken}`,
             },
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to get moods for user ${userId}`);
+            throw new Error(`Failed to get moods for user ${key.userId}`);
         }
 
         const json = await response.text();
@@ -81,22 +88,24 @@ export const allMoodsForUser =
  * Sends a PATCH request, appending a mood to user.
  * @param payload - User login details.
  * @param apiUrl The API URL
- * @param userId The user's ID
  * @returns The moods response if successful.
  * @throws Error if the request fails.
  */
 export const addMood =
-    async (payload: AddMoodPayload, userId: number, apiUrl: string = serviceApiUrl): Promise<AddMoodResponse> => {
-        const response = await fetch(`${apiUrl}/user/${userId}/moods`, {
+    async (payload: AddMoodPayload, apiUrl: string = serviceApiUrl): Promise<AddMoodResponse> => {
+        const key = getKey();
+
+        const response = await fetch(`${apiUrl}/user/${key.userId}/moods`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${key.accessToken}`,
             },
-            body: JSON.stringify(payload),
+            body: JSON.stringify([payload]),
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to add mood for user ${userId}`);
+            throw new Error(`Failed to add mood for user ${key.userId}`);
         }
 
         return response.json();

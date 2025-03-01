@@ -1,10 +1,12 @@
 import { render, screen } from '@testing-library/react';
+import {vi, expect, it, describe} from 'vitest';
 import LogMood from "./LogMood.tsx";
 
 
 describe('LogMood component', () => {
     beforeEach(() => {
-        render(<LogMood />);
+        const mockOnSubmit = vi.fn();
+        render(<LogMood onMoodSubmit={mockOnSubmit}/>);
     });
 
     it('renders the log mood form', () => {

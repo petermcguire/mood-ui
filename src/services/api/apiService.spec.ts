@@ -1,5 +1,5 @@
-import {allMoodsForUser, login, LoginPayload, LoginResponse, Mood} from './apiService';
-import {Mock, vi} from 'vitest';
+import {Mock, vi, expect, afterEach, it, describe} from 'vitest';
+import ApiService, {LoginPayload, LoginResponse, Mood} from './apiService';
 
 
 // Mock the fetch API globally
@@ -7,6 +7,14 @@ global.fetch = vi.fn();
 
 describe('apiService', () => {
     const mockAPIUrl = 'https://mock-api.com';
+    const mockLoginResponse: LoginResponse = {
+        accessToken: "testToken",
+        userId: 1
+    };
+
+    afterEach(() => {
+        vi.resetAllMocks();
+    })
 
     describe('Mood', () => {
         it('should correctly initialize fields during object creation', () => {
@@ -24,20 +32,15 @@ describe('apiService', () => {
 
     describe('login', () => {
         it('should call the API with correct payload and return the login response', async () => {
-            const mockResponse: LoginResponse = {
-                accessToken: "testToken",
-                userId: 1
-            };
-
             // Mock fetch to simulate a successful response
             (global.fetch as Mock).mockResolvedValueOnce({
                 ok: true,
-                json: vi.fn().mockResolvedValueOnce(mockResponse),
+                json: vi.fn().mockResolvedValueOnce(mockLoginResponse),
             });
 
             const payload = {username: 'testuser', password: 'password123'};
 
-            const response = await login(payload, mockAPIUrl);
+            const response = await ApiService.login(payload, mockAPIUrl);
 
             // Assert fetch is called exactly once with the correct arguments
             expect(global.fetch).toHaveBeenCalledTimes(1);
@@ -48,7 +51,7 @@ describe('apiService', () => {
             });
 
             // Assert the response is the same as the mock response
-            expect(response).toEqual(mockResponse);
+            expect(response).toEqual(mockLoginResponse);
         });
 
         it('should throw an error when the response is not ok', async () => {
@@ -61,7 +64,7 @@ describe('apiService', () => {
             const payload: LoginPayload = {username: 'invaliduser', password: 'wrongpassword'};
 
             // Expect the login function to throw a "Login failed" error
-            await expect(login(payload, mockAPIUrl)).rejects.toThrow('Login failed');
+            await expect(ApiService.login(payload, mockAPIUrl)).rejects.toThrow('Login failed');
         });
 
         it('should throw an error if the fetch call itself fails', async () => {
@@ -71,7 +74,7 @@ describe('apiService', () => {
             const payload: LoginPayload = {username: 'testuser', password: 'password123'};
 
             // Expect the login function to throw the same network error
-            await expect(login(payload, mockAPIUrl)).rejects.toThrow('Network error');
+            await expect(ApiService.login(payload, mockAPIUrl)).rejects.toThrow('Network error');
         });
     });
 
@@ -90,7 +93,7 @@ describe('apiService', () => {
                 text: vi.fn().mockResolvedValueOnce(JSON.stringify(mockResponse)),
             });
 
-            const response = await allMoodsForUser(mockAPIUrl, testUserId, testToken);
+            const response = await ApiService.allMoodsForUser(mockAPIUrl, mockLoginResponse);
 
             // Assert fetch is called exactly once with the correct arguments
             expect(global.fetch).toHaveBeenCalledTimes(1);
@@ -114,7 +117,7 @@ describe('apiService', () => {
             });
             // Expect thrown error
             await expect(
-                allMoodsForUser(mockAPIUrl, testUserId, testToken)
+                ApiService.allMoodsForUser(mockAPIUrl, mockLoginResponse)
             ).rejects.toThrow(`Failed to get moods for user ${testUserId}`);
         });
     });

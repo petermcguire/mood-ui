@@ -40,7 +40,7 @@ const getKey = () => {
  * @returns The login response if successful.
  * @throws Error if the request fails.
  */
-export const login =
+const login =
     async (payload: LoginPayload, apiUrl: string = serviceApiUrl): Promise<LoginResponse> => {
     const response = await fetch(`${apiUrl}/auth/login`, {
         method: 'POST',
@@ -60,23 +60,22 @@ export const login =
 /**
  * Sends a GET request to get a user's moods.
  * @param apiUrl The API URL
+ * @param userContext The LoginResponse context for the user
  * @returns The moods response if successful.
  * @throws Error if the request fails.
  */
-export const allMoodsForUser =
-    async (apiUrl: string = serviceApiUrl): Promise<Mood[]> => {
-        const key = getKey();
-
-        const response = await fetch(`${apiUrl}/user/${key.userId}/moods`, {
+const allMoodsForUser =
+    async (apiUrl: string = serviceApiUrl, userContext: LoginResponse = getKey()): Promise<Mood[]> => {
+        const response = await fetch(`${apiUrl}/user/${userContext.userId}/moods`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${key.accessToken}`,
+                'Authorization': `Bearer ${userContext.accessToken}`,
             },
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to get moods for user ${key.userId}`);
+            throw new Error(`Failed to get moods for user ${userContext.userId}`);
         }
 
         const json = await response.text();
@@ -88,25 +87,33 @@ export const allMoodsForUser =
  * Sends a PATCH request, appending a mood to user.
  * @param payload - User login details.
  * @param apiUrl The API URL
+ * @param userContext The LoginResponse context for the user
  * @returns The moods response if successful.
  * @throws Error if the request fails.
  */
-export const addMood =
-    async (payload: AddMoodPayload, apiUrl: string = serviceApiUrl): Promise<AddMoodResponse> => {
-        const key = getKey();
-
-        const response = await fetch(`${apiUrl}/user/${key.userId}/moods`, {
+const addMood =
+    async (payload: AddMoodPayload, apiUrl: string = serviceApiUrl, userContext: LoginResponse = getKey()): Promise<AddMoodResponse> => {
+        const response = await fetch(`${apiUrl}/user/${userContext.userId}/moods`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${key.accessToken}`,
+                'Authorization': `Bearer ${userContext.accessToken}`,
             },
             body: JSON.stringify([payload]),
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to add mood for user ${key.userId}`);
+            throw new Error(`Failed to add mood for user ${userContext.userId}`);
         }
 
         return response.json();
     };
+
+const ApiService = {
+    getKey,
+    login,
+    allMoodsForUser,
+    addMood,
+}
+
+export default ApiService;

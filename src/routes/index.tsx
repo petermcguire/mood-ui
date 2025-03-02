@@ -14,7 +14,7 @@ export function RouteComponent() {
     const loginPayload: LoginPayload = { username, password };
     const data = await ApiService.login(loginPayload);
     signIn(data);
-    await navigate({to: `/dashboard/${data.userId}`});
+    await navigate({to: '/dashboard'});
   };
   return <App handleLogin={handleLogin} />
 }

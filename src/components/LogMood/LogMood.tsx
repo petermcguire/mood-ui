@@ -1,6 +1,7 @@
 import {Button, Rating } from "@mui/material";
 import {FormEvent, useState} from "react";
 import {AddMoodResponse, Mood} from "../../services/api/apiService.ts";
+import {useNavigate} from "@tanstack/react-router";
 
 type LogMoodProps = {
     onMoodSubmit: (mood: Mood) => Promise<AddMoodResponse>;
@@ -8,16 +9,16 @@ type LogMoodProps = {
 
 const LogMood = ({ onMoodSubmit }: LogMoodProps) => {
     const [moodLevel, setMoodLevel] = useState<number>(0);
+    const navigate = useNavigate();
 
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
-        console.log(moodLevel);
         try {
             const mood = new Mood();
             mood.level = moodLevel;
             mood.timestamp = new Date();
-            const resp = await onMoodSubmit(mood);
-            console.log(resp);
+            await onMoodSubmit(mood);
+            await navigate({to: '/dashboard'});
         } catch (error) {
             console.log(error);
         }
@@ -26,7 +27,7 @@ const LogMood = ({ onMoodSubmit }: LogMoodProps) => {
     return (
         <form onSubmit={handleSubmit}>
             <h1>Log yer mood</h1>
-            <Rating name="mood" defaultValue={5} precision={1} onChange={
+            <Rating name="mood" defaultValue={moodLevel} precision={1} onChange={
                 (_e, value) => value !== null && setMoodLevel(value)
             } />
             <Button type="submit" variant="contained" color="primary">

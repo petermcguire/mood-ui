@@ -13,7 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as IndexImport } from './routes/index'
-import { Route as AuthenticatedDashboardIdImport } from './routes/_authenticated/dashboard/$id'
+import { Route as AuthenticatedDashboardImport } from './routes/_authenticated/dashboard'
 
 // Create/Update Routes
 
@@ -28,9 +28,9 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthenticatedDashboardIdRoute = AuthenticatedDashboardIdImport.update({
-  id: '/dashboard/$id',
-  path: '/dashboard/$id',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
@@ -52,11 +52,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedImport
       parentRoute: typeof rootRoute
     }
-    '/_authenticated/dashboard/$id': {
-      id: '/_authenticated/dashboard/$id'
-      path: '/dashboard/$id'
-      fullPath: '/dashboard/$id'
-      preLoaderRoute: typeof AuthenticatedDashboardIdImport
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardImport
       parentRoute: typeof AuthenticatedImport
     }
   }
@@ -65,11 +65,11 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedDashboardIdRoute: typeof AuthenticatedDashboardIdRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedDashboardIdRoute: AuthenticatedDashboardIdRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -79,28 +79,28 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '': typeof AuthenticatedRouteWithChildren
-  '/dashboard/$id': typeof AuthenticatedDashboardIdRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '': typeof AuthenticatedRouteWithChildren
-  '/dashboard/$id': typeof AuthenticatedDashboardIdRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/_authenticated/dashboard/$id': typeof AuthenticatedDashboardIdRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '' | '/dashboard/$id'
+  fullPaths: '/' | '' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '' | '/dashboard/$id'
-  id: '__root__' | '/' | '/_authenticated' | '/_authenticated/dashboard/$id'
+  to: '/' | '' | '/dashboard'
+  id: '__root__' | '/' | '/_authenticated' | '/_authenticated/dashboard'
   fileRoutesById: FileRoutesById
 }
 
@@ -134,11 +134,11 @@ export const routeTree = rootRoute
     "/_authenticated": {
       "filePath": "_authenticated.ts",
       "children": [
-        "/_authenticated/dashboard/$id"
+        "/_authenticated/dashboard"
       ]
     },
-    "/_authenticated/dashboard/$id": {
-      "filePath": "_authenticated/dashboard/$id.tsx",
+    "/_authenticated/dashboard": {
+      "filePath": "_authenticated/dashboard.tsx",
       "parent": "/_authenticated"
     }
   }

@@ -14,7 +14,6 @@ const MoodChart = ({ data }: MoodChartProps) => {
                 {
                     scaleType: 'utc',
                     dataKey: 'timestamp',
-                    // data: [1,2,3,4],
                 }
             ]}
             series={[

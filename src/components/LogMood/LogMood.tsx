@@ -19,7 +19,8 @@ const LogMood = ({ username, onMoodSubmit }: LogMoodProps) => {
             mood.level = moodLevel;
             mood.timestamp = new Date();
             await onMoodSubmit(mood);
-            await navigate({to: '/dashboard'});
+            // effectively refresh page to get data loader to run again
+            await navigate({to: '/dashboard', replace: true});
         } catch (error) {
             console.log(error);
         }

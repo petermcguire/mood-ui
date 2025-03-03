@@ -9,7 +9,18 @@ type MoodChartProps = {
 const MoodChart = ({ data }: MoodChartProps) => {
     return (
         <LineChart
-            dataset={data.map(({ timestamp, level }) => ({ timestamp, level }))}
+            dataset={
+                // to overcome type mismatch
+                data.map(
+                    ({ timestamp, level }) => ({ timestamp, level })
+                )
+            }
+            yAxis={[
+                {
+                    min: 0,
+                    max: 5,
+                }
+            ]}
             xAxis={[
                 {
                     scaleType: 'utc',

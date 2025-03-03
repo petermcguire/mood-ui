@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { jwtDecode } from "jwt-decode";
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ context }) => {
@@ -6,5 +7,8 @@ export const Route = createFileRoute('/_authenticated')({
     if (!isLogged()) {
       throw redirect({ to: '/' })
     }
+    const key = context.authentication.getKey();
+    // add JWT info to context
+    return jwtDecode(JSON.stringify(key));
   },
 })

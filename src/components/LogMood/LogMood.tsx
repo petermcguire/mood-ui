@@ -4,10 +4,11 @@ import {AddMoodResponse, Mood} from "../../services/api/apiService.ts";
 import {useNavigate} from "@tanstack/react-router";
 
 type LogMoodProps = {
+    username: string;
     onMoodSubmit: (mood: Mood) => Promise<AddMoodResponse>;
 };
 
-const LogMood = ({ onMoodSubmit }: LogMoodProps) => {
+const LogMood = ({ username, onMoodSubmit }: LogMoodProps) => {
     const [moodLevel, setMoodLevel] = useState<number>(0);
     const navigate = useNavigate();
 
@@ -26,7 +27,7 @@ const LogMood = ({ onMoodSubmit }: LogMoodProps) => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <h1>Log yer mood</h1>
+            <h1>{username}, log yer mood</h1>
             <Rating name="mood" defaultValue={moodLevel} precision={1} onChange={
                 (_e, value) => value !== null && setMoodLevel(value)
             } />

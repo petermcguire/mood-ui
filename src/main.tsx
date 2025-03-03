@@ -12,7 +12,6 @@ const router = createRouter({
     routeTree,
     context: {
         authentication: undefined!,
-        apiUrl: import.meta.env.VITE_MOOD_API_URL,
     }
 })
 

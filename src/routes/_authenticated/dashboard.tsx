@@ -16,8 +16,9 @@ export const Route = createFileRoute('/_authenticated/dashboard')({
 function RouteComponent() {
   const username = Route.useRouteContext().username
   const moods = Route.useLoaderData()
+  const navigate = Route.useNavigate();
   const handleMoodSubmit = async (mood: Mood) => {
     return await ApiService.addMood(mood)
   }
-  return <Dashboard username={username} data={moods} handleMoodSubmit={handleMoodSubmit} />
+  return <Dashboard username={username} data={moods} handleMoodSubmit={handleMoodSubmit} navigate={navigate}/>
 }

@@ -1,10 +1,7 @@
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
-import {Mock, vi} from 'vitest';
+import {vi, expect, it, describe, Mock, beforeEach} from 'vitest';
 import userEvent from '@testing-library/user-event';
 import Login from './Login';
-
-// Mock the `onLogin` function
-// const submitButton = screen.getByRole('button', { name: 'Login' });
 
 describe('Login component', () => {
     let submitButton: HTMLElement;
@@ -38,7 +35,7 @@ describe('Login component', () => {
 
             await waitFor(() => {
                 // Verify that `onLogin` was called with the correct parameters
-                expect(mockOnLogin).toHaveBeenCalledTimes(1);
+                expect(mockOnLogin).toHaveBeenCalledOnce();
                 expect(mockOnLogin).toHaveBeenCalledWith('testuser', 'password123');
             });
         });

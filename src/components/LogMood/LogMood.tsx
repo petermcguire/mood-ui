@@ -9,13 +9,13 @@ type LogMoodProps = {
     navigate: UseNavigateResult<never>,
 };
 
-
-
 const LogMood = ({ username, onMoodSubmit, navigate }: LogMoodProps) => {
-    const [moodLevel, setMoodLevel] = useState<number>(0);
+    const [moodLevel, setMoodLevel] = useState(1);
+    const [error, setError] = useState('');
 
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
+        setError('');
         try {
             const mood = new Mood();
             mood.level = moodLevel;
@@ -24,19 +24,22 @@ const LogMood = ({ username, onMoodSubmit, navigate }: LogMoodProps) => {
             // effectively refresh page to get data loader to run again
             await navigate({to: '/dashboard', replace: true});
         } catch (error) {
-            console.log(error);
+            if (error instanceof Error) {
+                setError(error.message);
+            }
         }
     };
 
     return (
         <form onSubmit={handleSubmit}>
             <h1>{username}, log yer mood</h1>
-            <Rating data-testid="mood-rating" name="mood" defaultValue={moodLevel} precision={1} onChange={
+            <Rating data-testid="mood-rating" name="mood" value={moodLevel} precision={1} onChange={
                 (_e, value) => value !== null && setMoodLevel(value)
             } />
             <Button type="submit" variant="contained" color="primary">
                 Submit
             </Button>
+            {error && <p>{error}</p>}
         </form>
     );
 };

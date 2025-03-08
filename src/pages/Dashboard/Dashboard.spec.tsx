@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import Dashboard from "./Dashboard";
-import { vi } from "vitest";
+import { vi, describe, it, expect } from "vitest";
 
 // Mock LogMood component
 vi.mock('../../components/LogMood/LogMood.tsx', () => ({
@@ -14,7 +14,12 @@ describe('Dashboard component', () => {
   it("renders Dashboard component with ThemeProvider and LogMood child", () => {
     const mockedHandleMoodSubmit = vi.fn();
     // Render the Dashboard component
-    render(<Dashboard data={[{level: 1, timestamp: new Date()}]} handleMoodSubmit={mockedHandleMoodSubmit} username={username}/>);
+    render(<Dashboard
+        data={[{level: 1, timestamp: new Date()}]}
+        handleMoodSubmit={mockedHandleMoodSubmit}
+        username={username}
+        navigate={vi.fn()}
+    />);
 
     // Ensure the ThemeProvider is applied via the LogMood child component (basic check for rendering)
     const logMoodElement = screen.getByTestId("log-mood-mock");

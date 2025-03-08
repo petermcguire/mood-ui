@@ -1,47 +1,69 @@
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
-import {vi, expect, it, describe} from 'vitest';
+import {vi, expect, it, describe, Mock, beforeEach} from 'vitest';
 import LogMood from "./LogMood.tsx";
-import {AddMoodResponse} from "../../services/api/apiService.ts";
 
-const mockNavigate = vi.fn();
-const mockOnSubmit = vi.fn(async (): Promise<AddMoodResponse> => []);
-const mockOnSubmitError = vi.fn().mockRejectedValue(new Error('Submit failed'));
+
 
 describe('LogMood component', () => {
+    let submitButton: HTMLElement;
     const username = 'testuser';
+    const mockNavigate = vi.fn().mockResolvedValue(undefined);
 
-    beforeEach(() => {
-    });
+    describe('Successes', () => {
+        let mockOnSubmit: Mock;
 
-    it('renders the log mood form', () => {
-        render(<LogMood onMoodSubmit={mockOnSubmit} username={username} navigate={mockNavigate}/>);
-        const heading = screen.getByRole('heading', { name: `${username}, log yer mood`});
-        expect(heading).toBeInTheDocument();
-        const rating = screen.getByTestId('mood-rating');
-        expect(rating).toBeInTheDocument();
-        const button = screen.getByRole('button', { name: /submit/i });
-        expect(button).toBeInTheDocument();
-    });
+        beforeEach(() => {
+            mockOnSubmit = vi.fn().mockResolvedValue(undefined);
+            render(<LogMood onMoodSubmit={mockOnSubmit} username={username} navigate={mockNavigate}/>);
+            submitButton = screen.getByRole('button', { name: /submit/i });
+        });
 
-    it('calls navigate with correct arguments', async () => {
-        render(<LogMood onMoodSubmit={mockOnSubmit} username={username} navigate={mockNavigate}/>);
-        const button = screen.getByRole("button", { name: /submit/i });
-        expect(button).toBeInTheDocument();
+        it('renders the log mood form', () => {
+            const heading = screen.getByRole('heading', { name: `${username}, log yer mood`});
+            expect(heading).toBeInTheDocument();
+            const rating = screen.getByTestId('mood-rating');
+            expect(rating).toBeInTheDocument();
+            expect(submitButton).toBeInTheDocument();
+        });
 
-        fireEvent.click(button);
-
-        await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledOnce();
-            expect(mockNavigate).toHaveBeenCalledWith({ to: "/dashboard", replace: true });
+        it('calls navigate with correct arguments', async () => {
+            expect(submitButton).toBeInTheDocument();
+            fireEvent.click(submitButton);
+            await waitFor(() => {
+                expect(mockNavigate).toHaveBeenCalledOnce();
+                expect(mockNavigate).toHaveBeenCalledWith({ to: "/dashboard", replace: true });
+            });
         });
     });
 
-    // it('catches error and displays error message', async () => {
-    //     render(<LogMood onMoodSubmit={mockOnSubmitError} username={username} navigate={mockNavigate}/>);
-    //     const button = screen.getByRole("button", { name: /submit/i });
-    //     fireEvent.click(button);
-    //
-    //     await mockOnSubmit;
-    //
-    // });
+    describe('Failures', () => {
+        let mockOnSubmit: Mock;
+        let mockNavigate: Mock;
+
+        it('catches submit error and displays error message', async () => {
+            const errorMessage = 'Submit failed';
+            mockNavigate = vi.fn().mockResolvedValue(undefined);
+            mockOnSubmit = vi.fn().mockRejectedValue(new Error(errorMessage));
+            render(<LogMood onMoodSubmit={mockOnSubmit} username={username} navigate={mockNavigate}/>);
+            submitButton = screen.getByRole('button', { name: /submit/i });
+            fireEvent.click(submitButton);
+            await waitFor(() => {
+                const error = screen.getByText(errorMessage);
+                expect(error).toBeInTheDocument();
+            });
+        });
+
+        it('catches navigate error and displays error message', async () => {
+            const errorMessage = 'Navigate failed';
+            mockNavigate = vi.fn().mockRejectedValue(new Error(errorMessage));
+            mockOnSubmit = vi.fn().mockResolvedValue(undefined);
+            render(<LogMood onMoodSubmit={mockOnSubmit} username={username} navigate={mockNavigate}/>);
+            submitButton = screen.getByRole('button', { name: /submit/i });
+            fireEvent.click(submitButton);
+            await waitFor(() => {
+                const error = screen.getByText(errorMessage);
+                expect(error).toBeInTheDocument();
+            });
+        });
+    });
 });
